@@ -17,6 +17,7 @@ int main() {
     lcd_init(&lcd);
 
     u16 img[WIDTH * HEIGHT];
+    usize j = 0;
     // Generate red/blue linear gradient
     for (usize i = 0; i < WIDTH * HEIGHT; i++) {
         // (!!!) Framebuffer is column major
@@ -36,11 +37,14 @@ int main() {
     }
 
     while (true) {
-        lcd_draw(&lcd, TEST_IMAGE);
-        sleep_ms(500);
+        // lcd_draw(&lcd, TEST_IMAGE);
+        // sleep_ms(32);
+        img[j] = 0x00;
+        j = (++j) % (WIDTH * HEIGHT); 
+        img[j] = 0xFFFF;
+
         lcd_draw(&lcd, img);
-        sleep_ms(500);
+        sleep_ms(32);
     }
-    while (true);
     return 0;
 }

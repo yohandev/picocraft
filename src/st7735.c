@@ -1,8 +1,8 @@
 #include "st7735.h"
 
 void lcd_init(LCD* self) {
-    // Initialize SPI at 27MHz
-    spi_init(SPI_PORT, 27000000);
+    // Initialize SPI at 16MHz
+    spi_init(SPI_PORT, 16000000);
 
     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
     gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
