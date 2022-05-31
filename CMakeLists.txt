@@ -10,9 +10,12 @@ set(CMAKE_CXX_STANDARD 17)
 # Initialize RP Pico SDK
 pico_sdk_init()
 
-file(GLOB sources "src/*.c")
-add_executable(picocraft ${sources})
-include_directories(src)
+# Sources
+add_executable(picocraft
+    "src/main.c"
+    "src/st7789.c"
+)
+include_directories("src")
 
 # Enable usb output; Disable uart output
 pico_enable_stdio_usb(picocraft 1)
@@ -20,4 +23,10 @@ pico_enable_stdio_uart(picocraft 0)
 # Create map/bin/hex/uf2 file etc.
 pico_add_extra_outputs(picocraft)
 
-target_link_libraries(picocraft pico_stdlib hardware_spi hardware_dma)
+# Dependencies
+target_link_libraries(picocraft
+    pico_stdlib
+    hardware_spi
+    hardware_dma
+    hardware_pio
+)

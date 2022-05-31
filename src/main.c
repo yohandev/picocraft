@@ -1,50 +1,34 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-#include "hardware/spi.h"
 
-#include "util.h"
-#include "st7735.h"
-#include "test_img.h"
+#include "st7789.h"
 
-#define WIDTH ST7735_WIDTH
-#define HEIGHT ST7735_HEIGHT
+#define WIDTH 135
+#define HEIGHT 240
 
-LCD lcd;
+st7789 lcd = {
+    .width=WIDTH, .height=HEIGHT,
+    .sck=2, .mosi=3, .dc=6, .rst=7,
+    .spi=spi0, .baudrate=31250000,
+};
+rgb16 frame[WIDTH*HEIGHT] = {0};
 
 int main() {
     stdio_init_all();
+    st7789_init(&lcd);
 
-    lcd_init(&lcd);
-
-    u16 img[WIDTH * HEIGHT];
-    usize j = 0;
-    // Generate red/blue linear gradient
-    for (usize i = 0; i < WIDTH * HEIGHT; i++) {
-        // (!!!) Framebuffer is column major
-        u16 x = i / HEIGHT;
-        u16 y = i % HEIGHT;
-        // 0..160 -> 0..32(R)
-        u16 u = (x * 31) / WIDTH;
-        // 0..128 -> 0..32(B)
-        u16 v = (y * 31) / HEIGHT;
-
-        img[i] = (u << 11) | (v);
+    // Fill frame buffer with red
+    for (usize i = 0; i < WIDTH*HEIGHT; i++) {
+        frame[i] = (rgb16){ .r=0, .g=63, .b=31 };
     }
-    // Flip endianess(TODO use PIO)
-    for (usize i = 0; i < WIDTH * HEIGHT; i++) {
-        img[i] = (img[i] >> 8) | (img[i] << 8);
-        TEST_IMAGE[i] = (TEST_IMAGE[i] >> 8) | (TEST_IMAGE[i] << 8);
-    }
+
+    // Draw
+    st7789_draw(&lcd, (u8*)frame);
 
     while (true) {
-        // lcd_draw(&lcd, TEST_IMAGE);
-        // sleep_ms(32);
-        img[j] = 0x00;
-        j = (++j) % (WIDTH * HEIGHT); 
-        img[j] = 0xFFFF;
 
-        lcd_draw(&lcd, img);
-        sleep_ms(32);
     }
+
+    st7789_drop(&lcd);
     return 0;
 }

@@ -20,3 +20,10 @@ typedef int32_t i32;
 // 64-bit
 typedef uint64_t u64;
 typedef int64_t i64;
+
+// RGB565
+typedef struct {
+    u16 b : 5;
+    u16 g : 6;
+    u16 r : 5;
+} rgb16;
