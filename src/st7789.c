@@ -27,9 +27,6 @@ void st7789_drop(st7789* self) {
 }
 
 void st7789_write(st7789* self, const u8* cmd, usize argc) {
-    // 8-bit SPI
-    // spi_set_format(self->spi, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
-
     // Command
     gpio_put(self->dc, 0);
     spi_write_blocking(self->spi, cmd, 1);
@@ -58,7 +55,7 @@ void st7789_reset(st7789* self) {
         // Column address set
         4,   0, ST7789_CASET, 0, 40, (self->width + 40 - 1) >> 8, (self->width + 40 - 1) & 0xFF,
         // Row address set
-        4,   0, ST7789_RASET, 0, 53, (self->height + 53 - 1) >> 8, (self->height + 53 - 1) & 0xFF,
+        4,   0, ST7789_RASET, 0, 52, (self->height + 52 - 1) >> 8, (self->height + 52 - 1) & 0xFF,
         // Display on
         0,  50, ST7789_DISPON,
         // Memory write
@@ -102,6 +99,4 @@ void st7789_draw(st7789* self, const rgb16* buf) {
         // Start immediately
         true
     );
-
-    // spi_write16_blocking(self->spi, (u8*)buf, self->width * self->height);
 }
