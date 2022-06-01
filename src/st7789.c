@@ -12,11 +12,18 @@ void st7789_init(st7789* self) {
     gpio_set_dir(self->dc, GPIO_OUT);
     gpio_set_dir(self->rst, GPIO_OUT);
 
+    self->dma = dma_claim_unused_channel(true);
+    self->dma_cfg = dma_channel_get_default_config(self->dma);
+
+    channel_config_set_transfer_data_size(&self->dma_cfg, DMA_SIZE_16);
+    channel_config_set_dreq(&self->dma_cfg, spi_get_dreq(self->spi, true));
+
     st7789_reset(self);
 }
 
 void st7789_drop(st7789* self) {
     spi_deinit(self->spi);
+    dma_channel_unclaim(self->dma);
 }
 
 void st7789_write(st7789* self, const u8* cmd, usize argc) {
@@ -74,7 +81,27 @@ void st7789_reset(st7789* self) {
 }
 
 void st7789_draw(st7789* self, const rgb16* buf) {
+    // Data/Command -> Command
     gpio_put(self->dc, 1);
+    // SPI -> 16 bit
     spi_set_format(self->spi, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
-    spi_write16_blocking(self->spi, (u8*)buf, self->width * self->height);
+
+    // Await DMA
+    while (dma_channel_is_busy(self->dma));
+    // Await SPI FIFO
+    while (spi_get_hw(self->spi)->sr & SPI_SSPSR_BSY_BITS);
+
+    // Write: DMA -> SPI -> LCD!
+    dma_channel_configure(self->dma, &self->dma_cfg,
+        // Write addr
+        &spi_get_hw(self->spi)->dr,
+        // Read addr
+        (u8*)buf,
+        // Number of transfers
+        self->width * self->height,
+        // Start immediately
+        true
+    );
+
+    // spi_write16_blocking(self->spi, (u8*)buf, self->width * self->height);
 }

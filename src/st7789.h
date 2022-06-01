@@ -5,6 +5,7 @@
 
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "hardware/dma.h"
 
 #include "num.h"
 
@@ -44,16 +45,19 @@
 #define ST7789_COLMOD_16BIT 0x05
 
 typedef struct {
-    usize width;            // Width(px, display height)
-    usize height;           // Height(px, display width)
+    usize width;                // Width(px, display height)
+    usize height;               // Height(px, display width)
 
-    u32 sck;                // Clock pin
-    u32 mosi;               // Peripheral-in pin
-    u32 dc;                 // Data/Command pin
-    u32 rst;                // Reset pin
+    u32 sck;                    // Clock pin
+    u32 mosi;                   // Peripheral-in pin
+    u32 dc;                     // Data/Command pin
+    u32 rst;                    // Reset pin
 
-    spi_inst_t *const spi;  // SPI port to use
-    u32 baudrate;           // SPI baudrate(Hz)
+    spi_inst_t *const spi;      // SPI port to use
+    u32 baudrate;               // SPI baudrate(Hz)
+
+    u32 dma;                    // DMA channel to use
+    dma_channel_config dma_cfg; // DMA configuration
 } st7789;
 
 void st7789_init(st7789* self);

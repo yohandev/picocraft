@@ -20,7 +20,9 @@ int main() {
 
     // Draw
     while (true) {
+        u32 start = time_us_32();
         st7789_draw(&lcd, (rgb16*)bigsur_bmp);
+        printf("dt: %dus", time_us_32() - start);
         sleep_ms(500);
         st7789_draw(&lcd, frame);
         sleep_ms(500);
