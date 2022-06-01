@@ -1,3 +1,8 @@
 {
     "cmake.statusbar.visibility": "icon",
+    "files.associations": {
+        "dma.h": "c",
+        "pico.h": "c",
+        "platform.h": "c"
+    },
 }

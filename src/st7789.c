@@ -43,19 +43,15 @@ void st7789_reset(st7789* self) {
         // Color mode
         1,   5, ST7789_COLMOD, (ST7789_COLMOD_65K | ST7789_COLMOD_16BIT),
         // Rotation(landscape)
-        1,   0, ST7789_MADCTL, (ST7789_MADCTL_RGB | ST7789_MADCTL_MX | ST7789_MADCTL_MV),
+        1,   0, ST7789_MADCTL, (ST7789_MADCTL_RGB | ST7789_MADCTL_MV),
         // Inversion mode
         0,   1, ST7789_INVON,
         // Normal mode
         0,   1, ST7789_NORON,
-        // // Column address set
-        // 4,   0, ST7789_CASET, 0, 0, (self->width - 1) >> 8, (self->width - 1) & 0xFF,
-        // // Row address set
-        // 4,   0, ST7789_RASET, 0, 0, (self->height - 1) >> 8, (self->height - 1) & 0xFF,
         // Column address set
-        4,   0, ST7789_CASET, 0, 40, (240 + 40 - 1) >> 8, (240 + 40 - 1) & 0xFF,
+        4,   0, ST7789_CASET, 0, 40, (self->width + 40 - 1) >> 8, (self->width + 40 - 1) & 0xFF,
         // Row address set
-        4,   0, ST7789_RASET, 0, 53, (135 + 53 - 1) >> 8, (135 + 53 - 1) & 0xFF,
+        4,   0, ST7789_RASET, 0, 53, (self->height + 53 - 1) >> 8, (self->height + 53 - 1) & 0xFF,
         // Display on
         0,  50, ST7789_DISPON,
         // Memory write
@@ -77,8 +73,8 @@ void st7789_reset(st7789* self) {
     }
 }
 
-void st7789_draw(st7789* self, const u8* buf) {
+void st7789_draw(st7789* self, const rgb16* buf) {
     gpio_put(self->dc, 1);
     spi_set_format(self->spi, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
-    spi_write16_blocking(self->spi, buf, self->width * self->height);
+    spi_write16_blocking(self->spi, (u8*)buf, self->width * self->height);
 }

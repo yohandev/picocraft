@@ -44,8 +44,8 @@
 #define ST7789_COLMOD_16BIT 0x05
 
 typedef struct {
-    usize width;            // Width(px)
-    usize height;           // Height(px)
+    usize width;            // Width(px, display height)
+    usize height;           // Height(px, display width)
 
     u32 sck;                // Clock pin
     u32 mosi;               // Peripheral-in pin
@@ -61,4 +61,4 @@ void st7789_drop(st7789* self);
 
 void st7789_write(st7789* self, const u8* cmd, usize argc);
 void st7789_reset(st7789* self);
-void st7789_draw(st7789* self, const u8* buf);
+void st7789_draw(st7789* self, const rgb16* buf);
