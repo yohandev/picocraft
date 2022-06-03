@@ -26,4 +26,4 @@ typedef struct {
     u16 r : 5;
     u16 g : 6;
     u16 b : 5;
-} rgb16;
+} rgb565;

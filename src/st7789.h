@@ -58,11 +58,11 @@ typedef struct {
 
     u32 dma;                    // DMA channel to use
     dma_channel_config dma_cfg; // DMA configuration
-} st7789;
+} ST7789;
 
-void st7789_init(st7789* self);
-void st7789_drop(st7789* self);
+void st7789_init(ST7789* self);
+void st7789_drop(ST7789* self);
 
-void st7789_write(st7789* self, const u8* cmd, usize argc);
-void st7789_reset(st7789* self);
-void st7789_draw(st7789* self, const rgb16* buf);
+void st7789_write(ST7789* self, const u8* cmd, usize argc);
+void st7789_reset(ST7789* self);
+void st7789_draw(ST7789* self, const rgb565* buf);

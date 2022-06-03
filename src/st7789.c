@@ -1,6 +1,6 @@
 #include "st7789.h"
 
-void st7789_init(st7789* self) {
+void st7789_init(ST7789* self) {
     spi_init(self->spi, self->baudrate);
     spi_set_format(self->spi, 8, SPI_CPOL_1, SPI_CPHA_0, SPI_MSB_FIRST);
 
@@ -21,12 +21,12 @@ void st7789_init(st7789* self) {
     st7789_reset(self);
 }
 
-void st7789_drop(st7789* self) {
+void st7789_drop(ST7789* self) {
     spi_deinit(self->spi);
     dma_channel_unclaim(self->dma);
 }
 
-void st7789_write(st7789* self, const u8* cmd, usize argc) {
+void st7789_write(ST7789* self, const u8* cmd, usize argc) {
     // Command
     gpio_put(self->dc, 0);
     spi_write_blocking(self->spi, cmd, 1);
@@ -37,7 +37,7 @@ void st7789_write(st7789* self, const u8* cmd, usize argc) {
     }
 }
 
-void st7789_reset(st7789* self) {
+void st7789_reset(ST7789* self) {
     // [argc], [sleep(ms * 10)], [cmd], [argv...]
     u8 inst[] = {
         // Software reset
@@ -77,7 +77,7 @@ void st7789_reset(st7789* self) {
     }
 }
 
-void st7789_draw(st7789* self, const rgb16* buf) {
+void st7789_draw(ST7789* self, const rgb565* buf) {
     // Data/Command -> Command
     gpio_put(self->dc, 1);
     // SPI -> 16 bit
