@@ -20,6 +20,8 @@ typedef int32_t i32;
 // 64-bit
 typedef uint64_t u64;
 typedef int64_t i64;
+// Floating point
+typedef float f32;
 
 // RGB565
 typedef struct {

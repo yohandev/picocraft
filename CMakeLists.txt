@@ -14,6 +14,7 @@ pico_sdk_init()
 add_executable(picocraft
     "src/main.c"
     "src/st7789.c"
+    "src/texture.c"
 )
 include_directories("src")
 
