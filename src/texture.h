@@ -3,6 +3,7 @@
  */
 #pragma once
 
+#include "pico/stdlib.h"
 #include "num.h"
 
 typedef struct {
@@ -26,7 +27,7 @@ static inline rgb565 texture_get(Texture* self, i32 x, i32 y) {
     assert(x >= 0 && x < self->width);
     assert(y >= 0 && y < self->height);
 
-    return texture_get_unchecked(x, y);
+    return texture_get_unchecked(self, x, y);
 }
 
 static inline void texture_set_unchecked(Texture* self, i32 x, i32 y, rgb565 c) {
@@ -37,5 +38,5 @@ static inline void texture_set(Texture* self, i32 x, i32 y, rgb565 c) {
     assert(x >= 0 && x < self->width);
     assert(y >= 0 && y < self->height);
 
-    texture_set_unchecked(x, y, c);
+    texture_set_unchecked(self, x, y, c);
 }
