@@ -12,7 +12,7 @@ void st7789_init(ST7789* self) {
     gpio_set_dir(self->dc, GPIO_OUT);
     gpio_set_dir(self->rst, GPIO_OUT);
 
-    self->dma = dma_claim_unused_channel(true);
+    self->dma = dma_claim_unused_channel(false);
     self->dma_cfg = dma_channel_get_default_config(self->dma);
 
     channel_config_set_transfer_data_size(&self->dma_cfg, DMA_SIZE_16);

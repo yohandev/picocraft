@@ -2,7 +2,7 @@
 #include "pico/stdlib.h"
 
 #include "st7789.h"
-#include "texture.h"
+// #include "texture.h"
 
 #define WIDTH 240
 #define HEIGHT 135
@@ -23,26 +23,27 @@ ST7789 lcd = {
     .sck=2, .mosi=3, .dc=6, .rst=7,
     .spi=spi0, .baudrate=125000000,
 };
-Texture frame = {
-    .width=WIDTH, .height=HEIGHT
-};
+// Texture frame = {
+//     .width=WIDTH, .height=HEIGHT
+// };
+rgb565 frame[WIDTH*HEIGHT] = {0};
 
 int main() {
     stdio_init_all();
     st7789_init(&lcd);
-    texture_init(&frame);
+    // texture_init(&frame);
 
     // Draw
     while (true) {
         for (usize i = 0; i < 8; i++) {
-            texture_fill(&frame, COLORS[i]);
-            st7789_draw(&lcd, frame.buf);
+            // texture_fill(&frame, COLORS[i]);
+            st7789_draw(&lcd, frame);
             sleep_ms(100);
         }
-        printf("boop\n");
+        puts("tick");
     }
 
     st7789_drop(&lcd);
-    texture_drop(&frame);
+    // texture_drop(&frame);
     return 0;
 }

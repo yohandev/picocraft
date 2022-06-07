@@ -7,7 +7,7 @@
 			"command": "/usr/local/bin/cmake",
 			"args": [
 				"--build", "/Users/yohan/Documents/Projects/picocraft/build",
-				"--config", "Debug",
+				"--config", "Release",
 				"--target", "all",
 				"-j", "10",
 				"--",
