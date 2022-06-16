@@ -15,24 +15,28 @@ pico_sdk_init()
 add_executable(picocraft
     "src/main.c"
     "src/st7789.c"
-    # "src/texture.c"
 )
 include_directories("src")
 
-# Enable usb output; Disable uart output
+# Disable usb & uart output
 pico_enable_stdio_usb(picocraft 0)
-pico_enable_stdio_uart(picocraft 1)
+pico_enable_stdio_uart(picocraft 0)
 # Create map/bin/hex/uf2 file etc.
 pico_add_extra_outputs(picocraft)
 
 # Sleep -> busy wait, saves 4kb
 target_compile_definitions(hardware_timer INTERFACE PICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
+# Panic -> loopm saves 6kb
+target_compile_definitions(pico_runtime INTERFACE PICO_PANIC_FUNCTION=)
 
 add_compile_options(-Wall)
 
 # Dependencies
 target_link_libraries(picocraft
+    # pico_standard_link
+    # pico_runtime
     pico_stdlib
+    hardware_gpio
     hardware_spi
     hardware_dma
 )

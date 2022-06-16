@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "pico/stdlib.h"
+#include "hardware/gpio.h"
 #include "hardware/spi.h"
 #include "hardware/dma.h"
 
