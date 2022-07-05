@@ -37,13 +37,39 @@
 				"reveal": "silent"
 			}
 		},
+        {
+            "label": "Flash .elf",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                // !!! `cargo install cargo-flash` required !!!
+                "flash",
+                "--elf", "build/picocraft.elf",
+                "--chip", "rp2040"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "presentation": {
+                "reveal": "silent"
+            }
+        },
+        {
+            "label": "Build & Flash",
+            "dependsOrder": "sequence",
+            "dependsOn": ["CMake Build", "Flash .elf"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
 		{
 			"label": "Build & Boot",
 			"dependsOrder": "sequence",
 			"dependsOn": ["CMake Build", "Copy .uf2"],
 			"group": {
 				"kind": "build",
-				"isDefault": true
+				"isDefault": false
 			}
 		}
 	]
