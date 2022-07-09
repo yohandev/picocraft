@@ -29,6 +29,10 @@ int main() {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
+    for (usize i = 0; i < WIDTH*HEIGHT; i++) {
+        frame[i] = (rgb565){ .r=0, .g=63, .b=0};
+    }
+
     // Draw
     while (true) {
         st7789_draw(&lcd, frame);
