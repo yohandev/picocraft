@@ -15,6 +15,7 @@ pico_sdk_init()
 add_executable(picocraft
     "src/main.c"
     "src/st7789.c"
+    "src/draw.c"
 )
 include_directories("src")
 

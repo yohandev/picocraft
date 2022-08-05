@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 typedef size_t usize;
 // 8-bit
@@ -25,16 +26,14 @@ typedef float f32;
 
 // 24.8 fixed point, ARM implementation based on the paper:
 // https://developer.arm.com/documentation/dai0033/a/
-typedef struct {
-    i32 i;
-} fixed;
+typedef i32 fixed;
 
 // RGB565
 typedef union {
     struct {
-        u16 r : 5;
-        u16 g : 6;
         u16 b : 5;
+        u16 g : 6;
+        u16 r : 5;
     };
     u16 rgb;
 } rgb565;
@@ -76,20 +75,23 @@ typedef struct {
 
 #define FIXED_FRAC_BITS 8
 
-inline fixed fadd(fixed self, fixed rhs) { return (fixed){(self.i + rhs.i)}; }
-inline fixed fsub(fixed self, fixed rhs) { return (fixed){(self.i + rhs.i)}; }
-inline fixed fmul(fixed self, fixed rhs) { return (fixed){(self.i * rhs.i) >> FIXED_FRAC_BITS}; }
-inline fixed fdiv(fixed self, fixed rhs) { return (fixed){(self.i << FIXED_FRAC_BITS) / rhs.i}; }
+inline fixed fadd(fixed lhs, fixed rhs) { return (lhs + rhs); }
+inline fixed fsub(fixed lhs, fixed rhs) { return (lhs + rhs); }
+inline fixed fmul(fixed lhs, fixed rhs) { return (lhs * rhs) >> FIXED_FRAC_BITS; }
+inline fixed fdiv(fixed lhs, fixed rhs) { return (lhs << FIXED_FRAC_BITS) / rhs; }
 
 inline fixed fixed_from_i32(i32 i) { return (fixed){(i << FIXED_FRAC_BITS)}; }
 inline fixed fixed_from_f32(f32 f) { return (fixed){(f * (1 << FIXED_FRAC_BITS))}; }
-inline i32 fixed_into_i32(fixed self) { return self.i >> FIXED_FRAC_BITS; }
-inline f32 fixed_into_f32(fixed self) { return (f32)self.i / (1 << FIXED_FRAC_BITS); }
+inline i32 fixed_into_i32(fixed self) { return self >> FIXED_FRAC_BITS; }
+inline f32 fixed_into_f32(fixed self) { return (f32)self / (1 << FIXED_FRAC_BITS); }
+
+inline fixed fixed_max(fixed a, fixed b) { return a > b ? a : b; }
+inline fixed fixed_min(fixed a, fixed b) { return a < b ? a : b; }
 
 inline rgba32 rgb_into(rgb565 self) {
-    u8 i = self.rgb >> 11;
+    u8 i = self.rgb & 0x1f;
     u8 j = (self.rgb >> 5) & 0x3f;
-    u8 k = self.rgb & 0x1f;
+    u8 k = self.rgb >> 11;
     return (rgba32){
         .r = (i << 3) | (i >> 2),   // ~0.25% error linear interpolation
         .g = (j << 2) | (j >> 4),   // ~0.27% error linear interpolation

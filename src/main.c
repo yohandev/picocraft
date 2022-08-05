@@ -1,24 +1,12 @@
 #include "hardware/gpio.h"
 
 #include "st7789.h"
-
-#define WIDTH 240
-#define HEIGHT 135
-
-const rgb565 COLORS[] = {
-    { .r=31, .g=63, .b=31 }, // White
-    { .r=31, .g=0,  .b=0 },  // Red
-    { .r=0,  .g=63, .b=0 },  // Green
-    { .r=0,  .g=0,  .b=31 }, // Blue
-    { .r=31, .g=0,  .b=31 }, // Purple
-    { .r=31, .g=63, .b=0 },  // Yellow
-    { .r=0,  .g=63, .b=31 }, // Cyan
-    { .r=0,  .g=0,  .b=0 },  // Black
-};
+#include "draw.h"
+#include "test.bmp.h"
 
 ST7789 lcd = {
     .width=WIDTH, .height=HEIGHT,
-    .sck=2, .mosi=3, .dc=6, .rst=7,
+    .sck=18, .mosi=19, .dc=3, .rst=2,
     .spi=spi0, .baudrate=125000000,
 };
 rgb565 frame[WIDTH*HEIGHT] = {0};
@@ -26,23 +14,17 @@ rgb565 frame[WIDTH*HEIGHT] = {0};
 int main() {
     st7789_init(&lcd);
 
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-
-    for (usize i = 0; i < WIDTH*HEIGHT; i++) {
-        frame[i] = (rgb565){ .r=0, .g=63, .b=0};
-    }
-
     // Draw
+    // frame_fill((rgb565){.r=0, .g=5, .b=0});
+    memcpy(frame, TEST_BMP, WIDTH*HEIGHT*sizeof(rgb565));
     while (true) {
+        frame_draw_line(
+            (vec2){.x=fixed_from_i32(10), .y=fixed_from_i32(10)},
+            (vec2){.x=fixed_from_i32(200), .y=fixed_from_i32(100)},
+            (rgb565){.r=0, .g=63, .b=31}
+        );
         st7789_draw(&lcd, frame);
-
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
-        sleep_ms(500);
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);
-        sleep_ms(500);
     }
 
     st7789_drop(&lcd);
-    return 0;
 }
