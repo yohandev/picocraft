@@ -1,7 +1,10 @@
-#include "hardware/gpio.h"
+#include <stdio.h>
+
+#include "pico/stdlib.h"
 
 #include "st7789.h"
 #include "draw.h"
+#include "fmt.h"
 #include "test.bmp.h"
 
 ST7789 lcd = {
@@ -12,14 +15,18 @@ ST7789 lcd = {
 rgb565 frame[WIDTH*HEIGHT] = {0};
 
 int main() {
+    stdout_init();
     st7789_init(&lcd);
 
     // Draw
     frame_fill(rgb(0, 100, 150));
-    frame_copy(TEST_BMP);
+    frame_copy((rgb565*)TEST_BMP);
     while (true) {
+        print("frame! time: {u32} {str}", time_us_32(), "hello");
+
         frame_draw_line(vec2(0, 3), vec2(100, 3), rgb(255, 0, 255));
         st7789_draw(&lcd, frame);
+        sleep_ms(16);
     }
     st7789_drop(&lcd);
 }

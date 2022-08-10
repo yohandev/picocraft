@@ -23,9 +23,8 @@ void frame_draw_line(vec2 a, vec2 b, rgb565 c) {
     d = div(d, steps);
 
     for (usize i = 0; i < fxfloor(steps); i++) {
-        if (cmp(a.x, >=, fixed(0)) && cmp(a.y, >=, fixed(0))
-        && cmp(a.x, <, fixed(WIDTH)) && cmp(a.y, <, fixed(HEIGHT))) {
-            *frame_get(fxfloor(a.x), fxfloor(a.y)) = c;
+        if (frame_in_bounds(a.x, a.y)) {
+            *frame_get2(a) = c;
         }
         a = add(a, d);
     }

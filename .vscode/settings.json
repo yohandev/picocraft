@@ -6,5 +6,5 @@
         "platform.h": "c",
         "stdlib.h": "c"
     },
-    "cmake.buildEnvironment": {},
+    "cmake.configureEnvironment": {},
 }
