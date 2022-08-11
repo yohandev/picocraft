@@ -14,7 +14,7 @@ PORT = [
     "/dev/tty.usbmodem14102",
 ]
 FMT = {
-    'chr': lambda mem: chr(next(mem)),
+    'char': lambda mem: chr(next(mem)),
     'u8': lambda mem: int.from_bytes(take(mem, 1), 'little', signed=False),
     'i8': lambda mem: int.from_bytes(take(mem, 1), 'little', signed=True),
     'u16': lambda mem: int.from_bytes(take(mem, 2), 'little', signed=False),
@@ -23,7 +23,8 @@ FMT = {
     'i32': lambda mem: int.from_bytes(take(mem, 4), 'little', signed=True),
     'u64': lambda mem: int.from_bytes(take(mem, 8), 'little', signed=False),
     'i64': lambda mem: int.from_bytes(take(mem, 8), 'little', signed=True),
-    'str': lambda mem: ''.join(iter(lambda: FMT['chr'](mem), '\0')),
+    'str': lambda mem: ''.join(iter(lambda: FMT['char'](mem), '\0')),
+    'fixed': lambda mem: FMT['i32'](mem) / (1 << 8),
 }
 FMT_PAT = re.compile(r"{[A-za-z0-9]*}")
 
@@ -68,11 +69,15 @@ with find_port() as ser:
     Awaits packets from serial, then formats them and prints
     """
     while True:
-        # [addr(fmt) | arg1 | arg2 | arg3 | (...)]
-        ln = drain(ser.readline)
-        # Reads the address from packet, then reads the string
-        # at that address from the elf file.
-        fmt = FMT['u32'](ln) - rodata.virtual_address
-        fmt = FMT['str'](iter(rodata.content[fmt:]))
+        try:
+            # [addr(fmt) | arg1 | arg2 | arg3 | (...)]
+            ln = drain(ser.readline)
+            # Reads the address from packet, then reads the string
+            # at that address from the elf file.
+            fmt = FMT['u32'](ln) - rodata.virtual_address
+            fmt = FMT['str'](iter(rodata.content[fmt:]))
 
-        print(fmt_sub(fmt, lambda t: str(FMT[t](ln))))
+            print(fmt_sub(fmt, lambda t: str(FMT[t](ln))))
+        # Clean exit
+        except KeyboardInterrupt:
+            break

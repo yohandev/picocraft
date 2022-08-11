@@ -12,10 +12,27 @@
 #define PRINT_UART_RX 17
 #define PRINT_UART_BAUDRATE 115200
 
-#define PRINT_FMT(X) {                              \
+#define PRINT_FMT_WRITE(X) ({                       \
     __typeof__(X) _x = (X);                         \
-    uart_write_blocking(uart0, (u8*)&_x, sizeof(X));\
-}
+    uart_write_blocking(                            \
+        PRINT_UART,                                 \
+        (u8*)&(_x),                                 \
+        sizeof(_x)                                  \
+    );                                              \
+})
+#define PRINT_FMT(X) {_Generic((X),                 \
+    char: PRINT_FMT_WRITE(X),                       \
+    char*: PRINT_FMT_WRITE(X),                      \
+    u8: PRINT_FMT_WRITE(X),                         \
+    i8: PRINT_FMT_WRITE(X),                         \
+    u16: PRINT_FMT_WRITE(X),                        \
+    i16: PRINT_FMT_WRITE(X),                        \
+    u32: PRINT_FMT_WRITE(X),                        \
+    i32: PRINT_FMT_WRITE(X),                        \
+    u64: PRINT_FMT_WRITE(X),                        \
+    i64: PRINT_FMT_WRITE(X),                        \
+    fixed: PRINT_FMT_WRITE(X)                       \
+);}
 #define PRINT_0()
 #define PRINT_1(X) PRINT_FMT(X)
 #define PRINT_2(X, ...) PRINT_FMT(X) PRINT_1(__VA_ARGS__)
@@ -38,7 +55,7 @@
 }
 
 // Initializes UART stdio
-void stdout_init() {
+inline void stdout_init() {
     stdio_uart_init_full(
         PRINT_UART,
         PRINT_UART_BAUDRATE,

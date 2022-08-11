@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "draw.h"
+#include "fmt.h"
 
 void frame_fill(rgb565 c) {
     for (usize i = 0; i < WIDTH*HEIGHT; i++) {

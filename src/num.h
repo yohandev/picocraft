@@ -87,7 +87,7 @@ typedef union {
 #define vec3(x, y, z) ((vec3){                      \
     fixed(x),                                       \
     fixed(y),                                       \
-    fixed(z)                                        \
+    fixed(z),                                       \
 })
 #define rgb(r, g, b) rgb_from((rgba32){r, g, b})
 

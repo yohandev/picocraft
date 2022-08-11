@@ -22,9 +22,7 @@ int main() {
     frame_fill(rgb(0, 100, 150));
     frame_copy((rgb565*)TEST_BMP);
     while (true) {
-        print("frame! time: {u32} {str}", time_us_32(), "hello");
-
-        frame_draw_line(vec2(0, 3), vec2(100, 3), rgb(255, 0, 255));
+        frame_draw_line(vec2(0, 30), vec2(100, 30), rgb(255, 0, 255));
         st7789_draw(&lcd, frame);
         sleep_ms(16);
     }
