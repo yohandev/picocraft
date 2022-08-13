@@ -40,7 +40,7 @@ typedef union {
     };
     i32 _v[2];
 } vec2;
-// Fixed 3D vector
+// 3D vector of `fixed`
 typedef union {
     struct {
         fixed x;
@@ -49,6 +49,24 @@ typedef union {
     };
     i32 _v[3];
 } vec3;
+
+// 2D vector of `i32`
+typedef union {
+    struct {
+        i32 x;
+        i32 y;
+    };
+    i32 _v[2];
+} ivec2;
+// 3D vector of `i32`
+typedef union {
+    struct {
+        i32 x;
+        i32 y;
+        i32 z;
+    };
+    i32 _v[3];
+} ivec3;
 
 // RGB565
 typedef union {
@@ -89,6 +107,9 @@ typedef union {
     fixed(y),                                       \
     fixed(z),                                       \
 })
+#define ivec2(x, y) ((ivec2){x, y})
+#define ivec3(x, y, z) ((ivec3){x, y, z})
+
 #define rgb(r, g, b) rgb_from((rgba32){r, g, b})
 
 // C++ : boring, repetitve boilerplate
@@ -102,6 +123,15 @@ typedef union {
         (a)._v[1] + (b)._v[1],                      \
     }),                                             \
     vec3: ((vec3){                                  \
+        (a)._v[0] + (b)._v[0],                      \
+        (a)._v[1] + (b)._v[1],                      \
+        (a)._v[2] + (b)._v[2],                      \
+    }),                                             \
+    ivec2: ((ivec2){                                \
+        (a)._v[0] + (b)._v[0],                      \
+        (a)._v[1] + (b)._v[1],                      \
+    }),                                             \
+    ivec3: ((ivec3){                                \
         (a)._v[0] + (b)._v[0],                      \
         (a)._v[1] + (b)._v[1],                      \
         (a)._v[2] + (b)._v[2],                      \
@@ -119,6 +149,15 @@ typedef union {
         (a)._v[0] - (b)._v[0],                      \
         (a)._v[1] - (b)._v[1],                      \
         (a)._v[2] - (b)._v[2],                      \
+    }),                                             \
+    ivec2: ((ivec2){                                \
+        (a)._v[0] - (b)._v[0],                      \
+        (a)._v[1] - (b)._v[1],                      \
+    }),                                             \
+    ivec3: ((ivec3){                                \
+        (a)._v[0] - (b)._v[0],                      \
+        (a)._v[1] - (b)._v[1],                      \
+        (a)._v[2] - (b)._v[2],                      \
     })                                              \
 )
 #define mul(a, b) _Generic((a),                     \
@@ -133,6 +172,15 @@ typedef union {
         ((a)._v[0] * (b)._v[0]) >> FIXED_FRAC_BITS, \
         ((a)._v[1] * (b)._v[0]) >> FIXED_FRAC_BITS, \
         ((a)._v[2] * (b)._v[0]) >> FIXED_FRAC_BITS, \
+    }),                                             \
+    ivec2: ((ivec2){                                \
+        (a)._v[0] * (b)._v[0],                      \
+        (a)._v[1] * (b)._v[0],                      \
+    }),                                             \
+    ivec3: ((ivec3){                                \
+        (a)._v[0] * (b)._v[0],                      \
+        (a)._v[1] * (b)._v[0],                      \
+        (a)._v[2] * (b)._v[0],                      \
     })                                              \
 )
 #define div(a, b) _Generic((a),                     \
@@ -147,6 +195,15 @@ typedef union {
         ((a)._v[0] << FIXED_FRAC_BITS) / (b)._v[0], \
         ((a)._v[1] << FIXED_FRAC_BITS) / (b)._v[0], \
         ((a)._v[2] << FIXED_FRAC_BITS) / (b)._v[0], \
+    }),                                             \
+    ivec2: ((ivec2){                                \
+        (a)._v[0] / (b)._v[0],                      \
+        (a)._v[1] / (b)._v[0],                      \
+    }),                                             \
+    ivec3: ((ivec3){                                \
+        (a)._v[0] / (b)._v[0],                      \
+        (a)._v[1] / (b)._v[0],                      \
+        (a)._v[2] / (b)._v[0],                      \
     })                                              \
 )
 #define cmp(a, op, b) _Generic((a),                 \
@@ -156,6 +213,15 @@ typedef union {
         ((a)._v[1] op (b)._v[1])                    \
     ),                                              \
     vec3: (                                         \
+        ((a)._v[0] op (b)._v[0]) &&                 \
+        ((a)._v[1] op (b)._v[1]) &&                 \
+        ((a)._v[2] op (b)._v[2])                    \
+    ),                                              \
+    ivec2: (                                        \
+        ((a)._v[0] op (b)._v[0]) &&                 \
+        ((a)._v[1] op (b)._v[1])                    \
+    ),                                              \
+    ivec3: (                                        \
         ((a)._v[0] op (b)._v[0]) &&                 \
         ((a)._v[1] op (b)._v[1]) &&                 \
         ((a)._v[2] op (b)._v[2])                    \
