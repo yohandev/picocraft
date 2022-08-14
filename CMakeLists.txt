@@ -15,6 +15,7 @@ add_executable(picocraft
     "src/main.c"
     "src/st7789.c"
     "src/draw.c"
+    "src/world.c"
 )
 include_directories("src")
 
