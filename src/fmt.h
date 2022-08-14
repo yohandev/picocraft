@@ -55,7 +55,7 @@
 }
 
 // Initializes UART stdio
-inline void stdout_init() {
+inline void stdout_init(void) {
     stdio_uart_init_full(
         PRINT_UART,
         PRINT_UART_BAUDRATE,
