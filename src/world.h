@@ -8,10 +8,12 @@
 
 // Size(in blocks) of a chunk
 #define CHUNK_SIZE 16
+#define CHUNK_AREA (CHUNK_SIZE * CHUNK_SIZE)
 #define CHUNK_VOLUME (CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE)
 
 // Size of chunk slot allocator
-#define MAX_CHUNKS 32
+#define CHUNK_SLOTS 32
+#define CHUNK_BUCKETS 128
 
 // A cubic segment of a Picocraft `World`
 typedef struct {
@@ -20,29 +22,20 @@ typedef struct {
 } Chunk;
 
 typedef struct {
-    Chunk chunks[MAX_CHUNKS];   // Heap for `Chunk`s
-    enum {
-        SLOT_UNINIT,            // Free slot
-        SLOT_OCCUPIED,          // Initialized and in-use
-        SLOT_STALE,             // Initialized but free for use
-    } slots[MAX_CHUNKS];        // Tracks state of slots in `chunks`
+    Chunk chunks[CHUNK_SLOTS];  // Heap for maybe-uninit `Chunk`s
+
+    bool slots[CHUNK_SLOTS];    // Tracks occupied slots in `chunks`
+    u8 bucket[CHUNK_BUCKETS];   // Hashmap of indices pointing in `chunks`
 } World;
 
-// Get the aligned position of the chunk that contains this block at `pos`
-inline ivec3 chunk_pos(ivec3 pos) {
-    // 0b[........|........|........|.....][...]
-    //           Truncate bits < CHUNK_SIZE ^
-    return (ivec3){
-        .x = pos.x & !(CHUNK_SIZE - 1),
-        .y = pos.y & !(CHUNK_SIZE - 1),
-        .z = pos.z & !(CHUNK_SIZE - 1),
-    };
-}
+void world_init(World* self);
 
 // Loads the chunk that contains `pos`, possibly returning `NULL` if OOM
 Chunk* world_load(World* self, ivec3 pos);
 // Gets the block at world position `pos`, returning `NULL` if not loaded
-Block* world_get(const World* self, ivec3 pos);
+Block* world_get(World* self, ivec3 pos);
+// Get the chunk that contains the world position `pos`, `NULL` if not loaded
+Chunk* world_get_chunk(World* self, ivec3 pos);
 // Shoots a ray in the world, returning `NULL` if it hit nothing or went
 // past loaded chunks
 Block* world_raycast(const World* self, vec3 from, vec3 dir);
