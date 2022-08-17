@@ -1,10 +1,7 @@
 #include <string.h>
 
 #include "world.h"
-
-#define LINEAR_IMPL
-
-#define BUCKET_VACANT (CHUNK_SLOTS + 1)
+#include "num.h"
 
 inline u32 chunk_hash(ivec3 pos) {
     u32 hash = 0;
@@ -43,66 +40,15 @@ inline usize block_idx(ivec3 pos) {
 }
 
 void world_init(World* self) {
-    memset(self->bucket, BUCKET_VACANT, CHUNK_BUCKETS);
-    memset(self->slots, false, CHUNK_SLOTS);
+    memset(self->slots, SLOT_VACANT, CHUNK_SLOTS);
 }
 
-#ifndef LINEAR_IMPL
-Chunk* world_load(World* self, ivec3 pos) {
-    ivec3 cpos = chunk_pos(pos);
-    usize bucket = chunk_hash(cpos);
-    usize slot;
-
-    // It should be impossible for this to loop forever, as
-    // there are more buckets than slots
-    for (
-        bucket &= (CHUNK_BUCKETS - 1);
-        self->bucket[bucket] != BUCKET_VACANT;
-        bucket = (bucket + 1) % CHUNK_BUCKETS
-    ) {
-        Chunk* c = &self->chunks[self->bucket[bucket]];
-        // Already loaded
-        if (cmp(c->pos, ==, cpos)) return c;
-    }
-    // Find a free slot
-    for (
-        slot = 0;
-        slot < CHUNK_SLOTS && self->slots[slot];
-        slot++
-    );
-    // OOM
-    if (slot >= CHUNK_SLOTS) return NULL;
-
-    Chunk* c = &self->chunks[slot];
-    // TODO load chunk from flash
-    memset(&c->blocks, 0, CHUNK_VOLUME);
-    c->pos = cpos;
-    // Occupy slot in hashmap
-    self->slots[slot] = true;
-    self->bucket[bucket] = slot;
-}
-
-Chunk* world_get_chunk(World* self, ivec3 pos) {
-    ivec3 cpos = chunk_pos(pos);
-    usize bucket = chunk_hash(cpos);
-
-    for (
-        bucket &= (CHUNK_BUCKETS - 1);
-        self->bucket[bucket] != BUCKET_VACANT;
-        bucket = (bucket + 1) % CHUNK_BUCKETS
-    ) {
-        Chunk* c = &self->chunks[self->bucket[bucket]];
-        // Found!
-        if (cmp(c->pos, ==, cpos)) return c;
-    }
-    // Not loaded
-    return NULL;
-}
-#else
 Chunk* world_load(World* self, ivec3 pos) {
     ivec3 cpos = chunk_pos(pos);
     usize slot;
 
+    // TODO check already loaded
+    
     // Find a free slot
     for (
         slot = 0;
@@ -132,12 +78,31 @@ Chunk* world_get_chunk(World* self, ivec3 pos) {
     }
     return NULL;
 }
-#endif
 
 Block* world_get(World* self, ivec3 pos) {
     return &world_get_chunk(self, pos)->blocks[block_idx(pos)];
 }
 
-Block* world_raycast(const World* self, vec3 from, vec3 dir) {
+Block* world_raycast(const World* self, vec3 a, vec3 d) {
+    // DDA algorithm
+    fixed steps = fxmax(fxabs(d.x), fxmax(fxabs(d.y), fxabs(d.z)));
 
+    if (cmp(steps, ==, fixed(0))) {
+        return;
+    }
+    d = div(d, steps);
+
+    Block* b;
+    ivec3 p;
+    for (usize i = 0; i < fxfloor(steps); i++) {
+        p = (ivec3){
+            .x = fxfloor(a.x),
+            .y = fxfloor(a.y),
+            .z = fxfloor(a.z),
+        };
+        if (b = world_get(self, p)) {
+            // TODO
+        }
+        a = add(a, d);
+    }
 }

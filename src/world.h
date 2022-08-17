@@ -13,7 +13,6 @@
 
 // Size of chunk slot allocator
 #define CHUNK_SLOTS 32
-#define CHUNK_BUCKETS 128
 
 // A cubic segment of a Picocraft `World`
 typedef struct {
@@ -23,9 +22,10 @@ typedef struct {
 
 typedef struct {
     Chunk chunks[CHUNK_SLOTS];  // Heap for maybe-uninit `Chunk`s
-
-    bool slots[CHUNK_SLOTS];    // Tracks occupied slots in `chunks`
-    u8 bucket[CHUNK_BUCKETS];   // Hashmap of indices pointing in `chunks`
+    enum {
+        SLOT_VACANT,            // Matching index in `chunks` is uninit
+        SLOT_OCCUPIED,          // Matching index in `chunks` is in-use
+    } slots[CHUNK_SLOTS];
 } World;
 
 void world_init(World* self);
